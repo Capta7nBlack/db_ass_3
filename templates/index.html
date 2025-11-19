@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Caregivers DB Admin (Full CRUD)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
+        h1 { text-align: center; color: #2c3e50; }
+        h3 { margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 10px; color: #2c3e50; }
+        
+        /* Container for the cards */
+        .container { display: flex; flex-direction: column; gap: 30px; align-items: center; }
+        
+        /* Card Style */
+        .card { background: white; padding: 20px; border-radius: 10px; width: 90%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* Table Styling */
+        .table-wrapper { overflow-x: auto; margin-bottom: 15px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #555; white-space: nowrap; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        
+        /* Form Styling */
+        form { background: #eef2f7; padding: 15px; border-radius: 5px; margin-top: 10px; }
+        .form-header { font-weight: bold; margin-bottom: 10px; color: #34495e; display: block; }
+        
+        /* Grid for inputs */
+        .input-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 120px; }
+        
+        /* Buttons */
+        button { cursor: pointer; background-color: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; transition: background 0.2s; min-width: 100px; }
+        button:hover { background-color: #27ae60; }
+        
+        /* Update Buttons */
+        .btn-update { background-color: #3498db; }
+        .btn-update:hover { background-color: #2980b9; }
+
+        /* Delete Button (Small) */
+        .del-btn { background-color: #e74c3c; padding: 5px 10px; font-size: 12px; min-width: auto; }
+        .del-btn:hover { background-color: #c0392b; }
+        
+        /* Inline Form for Delete */
+        form.inline-form { display: inline; padding: 0; background: none; margin: 0; }
+    </style>
+</head>
+<body>
+    <h1>Caregivers Database Management System</h1>
+    <div class="container">
+
+        <!-- 1. USER TABLE -->
+        <div class="card">
+            <h3>1. USERS (Parent Table)</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Email</th><th>Given Name</th><th>Surname</th><th>City</th><th>Phone</th><th>Desc</th><th>Password</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{u.user_id}}</td>
+                            <td>{{u.email}}</td>
+                            <td>{{u.given_name}}</td>
+                            <td>{{u.surname}}</td>
+                            <td>{{u.city}}</td>
+                            <td>{{u.phone_number}}</td>
+                            <td>{{u.profile_description}}</td>
+                            <td>{{u.password}}</td>
+                            <td><form action="/user/delete/{{u.user_id}}" method="post" class="inline-form"><button class="del-btn">Delete</button></form></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Create -->
+            <form action="/user/create" method="post">
+                <div class="form-header">Add New User (Full Profile)</div>
+                <div class="input-row">
+                    <input name="email" placeholder="Email" required>
+                    <input name="given_name" placeholder="First Name" required>
+                    <input name="surname" placeholder="Surname" required>
+                    <input name="password" placeholder="Password" required>
+                    <input name="city" placeholder="City">
+                    <input name="phone_number" placeholder="Phone">
+                    <input name="profile_description" placeholder="Description">
+                    <button>Create</button>
+                </div>
+            </form>
+            <!-- Update -->
+            <form action="/user/update_any" method="post" style="background: #e8f6f3;">
+                <div class="form-header">Update Any Field</div>
+                <div class="input-row">
+                    <input type="number" name="uid" placeholder="ID" required style="flex: 0 0 60px;">
+                    <select name="field_name" required>
+                        <option value="" disabled selected>Select Field</option>
+                        <option value="email">Email</option>
+                        <option value="given_name">Given Name</option>
+                        <option value="surname">Surname</option>
+                        <option value="city">City</option>
+                        <option value="phone_number">Phone</option>
+                        <option value="profile_description">Description</option>
+                        <option value="password">Password</option>
+                    </select>
+                    <input name="new_value" placeholder="New Value" required>
+                    <button class="btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 2. CAREGIVER TABLE -->
+        <div class="card">
+            <h3>2. CAREGIVERS (Subtype)</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>User ID</th><th>Photo</th><th>Gender</th><th>Type</th><th>Rate</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for c in caregivers %}
+                        <tr>
+                            <td>{{c.caregiver_user_id}}</td>
+                            <td>{{c.photo}}</td>
+                            <td>{{c.gender}}</td>
+                            <td>{{c.caregiving_type}}</td>
+                            <td>${{c.hourly_rate}}</td>
+                            <td><form action="/caregiver/delete/{{c.caregiver_user_id}}" method="post" class="inline-form"><button class="del-btn">Remove</button></form></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Create -->
+            <form action="/caregiver/create" method="post">
+                <div class="form-header">Promote User to Caregiver (Complete)</div>
+                <div class="input-row">
+                    <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 80px;">
+                    <input name="type" placeholder="Type (e.g. babysitter)" required>
+                    <input type="number" step="0.1" name="rate" placeholder="Rate ($)" required style="flex: 0 0 80px;">
+                    <input name="photo" placeholder="Photo URL">
+                    <input name="gender" placeholder="Gender (M/F)">
+                    <button>Add Role</button>
+                </div>
+            </form>
+            <!-- Update -->
+            <form action="/caregiver/update_any" method="post" style="background: #e8f6f3;">
+                <div class="form-header">Update Any Field</div>
+                <div class="input-row">
+                    <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 60px;">
+                    <select name="field_name" required>
+                        <option value="" disabled selected>Select Field</option>
+                        <option value="caregiving_type">Care Type</option>
+                        <option value="hourly_rate">Hourly Rate</option>
+                        <option value="photo">Photo URL</option>
+                        <option value="gender">Gender</option>
+                    </select>
+                    <input name="new_value" placeholder="New Value" required>
+                    <button class="btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 3. MEMBER TABLE -->
+        <div class="card">
+            <h3>3. MEMBERS (Subtype)</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>User ID</th><th>House Rules</th><th>Dependent Desc</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for m in members %}
+                        <tr>
+                            <td>{{m.member_user_id}}</td>
+                            <td>{{m.house_rules}}</td>
+                            <td>{{m.dependent_description}}</td>
+                            <td><form action="/member/delete/{{m.member_user_id}}" method="post" class="inline-form"><button class="del-btn">Remove</button></form></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Create -->
+            <form action="/member/create" method="post">
+                <div class="form-header">Promote User to Member (Complete)</div>
+                <div class="input-row">
+                    <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 80px;">
+                    <input name="rules" placeholder="House Rules" required>
+                    <input name="desc" placeholder="Dependent Desc" required>
+                    <button>Add Role</button>
+                </div>
+            </form>
+            <!-- Update -->
+            <form action="/member/update_any" method="post" style="background: #e8f6f3;">
+                <div class="form-header">Update Any Field</div>
+                <div class="input-row">
+                    <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 60px;">
+                    <select name="field_name" required>
+                        <option value="" disabled selected>Select Field</option>
+                        <option value="house_rules">House Rules</option>
+                        <option value="dependent_description">Dependent Desc</option>
+                    </select>
+                    <input name="new_value" placeholder="New Value" required>
+                    <button class="btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 4. ADDRESS TABLE -->
+        <div class="card">
+            <h3>4. ADDRESSES</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Mem ID</th><th>House #</th><th>Street</th><th>Town</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for a in addresses %}
+                        <tr>
+                            <td>{{a.member_user_id}}</td>
+                            <td>{{a.house_number}}</td>
+                            <td>{{a.street}}</td>
+                            <td>{{a.town}}</td>
+                            <td><form action="/address/delete/{{a.member_user_id}}" method="post" class="inline-form"><button class="del-btn">Delete</button></form></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Create -->
+            <form action="/address/create" method="post">
+                <div class="form-header">Add Address (Complete)</div>
+                <div class="input-row">
+                    <input type="number" name="uid" placeholder="Mem ID" required style="flex: 0 0 80px;">
+                    <input name="num" placeholder="House #" required style="flex: 0 0 80px;">
+                    <input name="street" placeholder="Street" required>
+                    <input name="town" placeholder="Town" required>
+                    <button>Add</button>
+                </div>
+            </form>
+            <!-- Update -->
+            <form action="/address/update_any" method="post" style="background: #e8f6f3;">
+                <div class="form-header">Update Any Field</div>
+                <div class="input-row">
+                    <input type="number" name="uid" placeholder="Mem ID" required style="flex: 0 0 60px;">
+                    <select name="field_name" required>
+                        <option value="" disabled selected>Select Field</option>
+                        <option value="house_number">House #</option>
+                        <option value="street">Street</option>
+                        <option value="town">Town</option>
+                    </select>
+                    <input name="new_value" placeholder="New Value" required>
+                    <button class="btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 5. JOB TABLE -->
+        <div class="card">
+            <h3>5. JOBS</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Mem ID</th><th>Type</th><th>Requirements</th><th>Date</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for j in jobs %}
+                        <tr>
+                            <td>{{j.job_id}}</td>
+                            <td>{{j.member_user_id}}</td>
+                            <td>{{j.required_caregiving_type}}</td>
+                            <td>{{j.other_requirements}}</td>
+                            <td>{{j.date_posted}}</td>
+                            <td><form action="/job/delete/{{j.job_id}}" method="post" class="inline-form"><button class="del-btn">Delete</button></form></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Create -->
+            <form action="/job/create" method="post">
+                <div class="form-header">Post New Job</div>
+                <div class="input-row">
+                    <input type="number" name="mid" placeholder="Mem ID" required style="flex: 0 0 80px;">
+                    <input name="type" placeholder="Care Type" required>
+                    <input name="req" placeholder="Requirements">
+                    <button>Post</button>
+                </div>
+            </form>
+            <!-- Update -->
+            <form action="/job/update_any" method="post" style="background: #e8f6f3;">
+                <div class="form-header">Update Any Field</div>
+                <div class="input-row">
+                    <input type="number" name="jid" placeholder="Job ID" required style="flex: 0 0 60px;">
+                    <select name="field_name" required>
+                        <option value="" disabled selected>Select Field</option>
+                        <option value="required_caregiving_type">Care Type</option>
+                        <option value="other_requirements">Requirements</option>
+                        <option value="date_posted">Date Posted</option>
+                    </select>
+                    <input name="new_value" placeholder="New Value" required>
+                    <button class="btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 6. APPLICATIONS -->
+        <div class="card">
+            <h3>6. APPLICATIONS</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>CG ID</th><th>Job ID</th><th>Date Applied</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for a in apps %}
+                        <tr>
+                            <td>{{a.caregiver_user_id}}</td>
+                            <td>{{a.job_id}}</td>
+                            <td>{{a.date_applied}}</td>
+                            <td><form action="/app/delete" method="post" class="inline-form"><input type="hidden" name="jid" value="{{a.job_id}}"><input type="hidden" name="cid" value="{{a.caregiver_user_id}}"><button class="del-btn">Delete</button></form></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Create -->
+            <form action="/app/create" method="post">
+                <div class="form-header">Apply for Job</div>
+                <div class="input-row">
+                    <input type="number" name="jid" placeholder="Job ID" required>
+                    <input type="number" name="cid" placeholder="CG ID" required>
+                    <button>Apply</button>
+                </div>
+            </form>
+            <!-- Update -->
+            <form action="/app/update_any" method="post" style="background: #e8f6f3;">
+                <div class="form-header">Update Application Date</div>
+                <div class="input-row">
+                    <input type="number" name="jid" placeholder="Job ID" required style="flex: 0 0 60px;">
+                    <input type="number" name="cid" placeholder="CG ID" required style="flex: 0 0 60px;">
+                    <select name="field_name" required>
+                        <option value="date_applied" selected>Date Applied</option>
+                    </select>
+                    <input name="new_value" placeholder="YYYY-MM-DD" required>
+                    <button class="btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 7. APPOINTMENTS -->
+        <div class="card">
+            <h3>7. APPOINTMENTS</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>CG</th><th>Mem</th><th>Date</th><th>Time</th><th>Hours</th><th>Status</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for ap in appts %}
+                        <tr>
+                            <td>{{ap.appointment_id}}</td>
+                            <td>{{ap.caregiver_user_id}}</td>
+                            <td>{{ap.member_user_id}}</td>
+                            <td>{{ap.appointment_date}}</td>
+                            <td>{{ap.appointment_time}}</td>
+                            <td>{{ap.work_hours}}</td>
+                            <td>{{ap.status}}</td>
+                            <td><form action="/appt/delete/{{ap.appointment_id}}" method="post" class="inline-form"><button class="del-btn">Delete</button></form></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Create -->
+            <form action="/appt/create" method="post">
+                <div class="form-header">Book Appointment (Complete)</div>
+                <div class="input-row">
+                    <input type="number" name="cid" placeholder="CG ID" required style="flex: 0 0 60px;">
+                    <input type="number" name="mid" placeholder="Mem ID" required style="flex: 0 0 60px;">
+                    <input type="date" name="date" required>
+                    <input type="time" name="time" required>
+                    <input type="number" name="hours" placeholder="Hrs" required style="flex: 0 0 50px;">
+                    <button>Book</button>
+                </div>
+            </form>
+            <!-- Update -->
+            <form action="/appt/update_any" method="post" style="background: #e8f6f3;">
+                <div class="form-header">Update Any Field</div>
+                <div class="input-row">
+                    <input type="number" name="aid" placeholder="Appt ID" required style="flex: 0 0 60px;">
+                    <select name="field_name" required>
+                        <option value="" disabled selected>Select Field</option>
+                        <option value="status">Status</option>
+                        <option value="appointment_date">Date</option>
+                        <option value="appointment_time">Time</option>
+                        <option value="work_hours">Hours</option>
+                    </select>
+                    <input name="new_value" placeholder="Value (e.g. Accepted)" required>
+                    <button class="btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>
