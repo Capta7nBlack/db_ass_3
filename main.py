@@ -2,7 +2,7 @@ import sqlalchemy
 from sqlalchemy import create_engine, text
 
 # CONFIGURATION
-db_string = "postgresql://Capta7nBlack@localhost:5432/caregivers_db"
+db_string = "postgresql://caregivers_db_7dm8_user:pKjPqCvuTRFyjTPDEc9noF94yNRb7ZmD@dpg-d4i4i5buibrs73dvgfp0-a/caregivers_db_7dm8"
 engine = create_engine(db_string)
 
 def create_tables():
