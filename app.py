@@ -6,7 +6,15 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import create_engine, text
 
 # 1. Database Connection (Cloud or Local)
-url = "postgresql://caregivers_db_7dm8_user:pKjPqCvuTRFyjTPDEc9noF94yNRb7ZmD@dpg-d4i4i5buibrs73dvgfp0-a/caregivers_db_7dm8"
+
+
+url = os.getenv("DATABASE_URL")
+if not url:
+    url = "postgresql://Capta7nBlack@localhost:5432/caregivers_db"
+if url and url.startswith("postgres://"):
+    url = url.replace("postgres://", "postgresql://", 1)
+
+
 engine = create_engine(url)
 
 app = FastAPI()

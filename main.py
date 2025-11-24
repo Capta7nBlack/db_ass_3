@@ -1,8 +1,18 @@
 import sqlalchemy
 from sqlalchemy import create_engine, text
-
+import os
 # CONFIGURATION
-db_string = "postgresql://caregivers_db_7dm8_user:pKjPqCvuTRFyjTPDEc9noF94yNRb7ZmD@dpg-d4i4i5buibrs73dvgfp0-a/caregivers_db_7dm8"
+
+
+db_string = os.getenv("DATABASE_URL")
+if not db_string:
+    db_string = "postgresql://Capta7nBlack@localhost:5432/caregivers_db"
+if db_string and db_string.startswith("postgres://"):
+    db_string = url.replace("postgres://", "postgresql://", 1)
+
+
+
+
 engine = create_engine(db_string)
 
 def create_tables():
@@ -94,7 +104,6 @@ def seed_data():
     with engine.connect() as conn:
         print("2. Seeding POP CULTURE data...")
         
-        # Clear tables
         conn.execute(text("TRUNCATE TABLE APPOINTMENT, JOB_APPLICATION, JOB, ADDRESS, MEMBER, CAREGIVER, \"USER\" RESTART IDENTITY CASCADE;"))
 
         
@@ -161,7 +170,6 @@ def seed_data():
         """
         conn.execute(text(mem_sql))
 
-        # 4. INSERT ADDRESSES
         addr_sql = """
         INSERT INTO ADDRESS (member_user_id, house_number, street, town) VALUES
         (1, '10', 'Mangilik El', 'Astana'),
@@ -178,7 +186,6 @@ def seed_data():
         """
         conn.execute(text(addr_sql))
 
-        # 5. INSERT JOBS
         job_sql = """
         INSERT INTO JOB (member_user_id, required_caregiving_type, other_requirements, date_posted) VALUES
         (2, 'caregiver for elderly', 'Must be soft-spoken', '2025-11-01'),
@@ -195,7 +202,6 @@ def seed_data():
         """
         conn.execute(text(job_sql))
 
-        # 6. INSERT APPLICATIONS
         app_sql = """
         INSERT INTO JOB_APPLICATION (caregiver_user_id, job_id, date_applied) VALUES
         (4, 1, '2025-11-03'),
@@ -212,7 +218,6 @@ def seed_data():
         """
         conn.execute(text(app_sql))
 
-        # 7. INSERT APPOINTMENTS
         apt_sql = """
         INSERT INTO APPOINTMENT (caregiver_user_id, member_user_id, appointment_date, appointment_time, work_hours, status) VALUES
         (3, 1, '2025-11-20', '14:00', 4, 'Accepted'),
