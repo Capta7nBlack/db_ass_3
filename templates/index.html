@@ -1,57 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Caregivers DB Admin (Full CRUD)</title>
+    <title>Caregivers DB Admin</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
         h1 { text-align: center; color: #2c3e50; }
         h3 { margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 10px; color: #2c3e50; }
-        
-        /* Container for the cards */
         .container { display: flex; flex-direction: column; gap: 30px; align-items: center; }
-        
-        /* Card Style */
         .card { background: white; padding: 20px; border-radius: 10px; width: 90%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
-        /* Table Styling */
         .table-wrapper { overflow-x: auto; margin-bottom: 15px; border: 1px solid #eee; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f8f9fa; font-weight: 600; color: #555; white-space: nowrap; }
         tr:nth-child(even) { background-color: #f9f9f9; }
         tr:hover { background-color: #f1f1f1; }
-        
-        /* Form Styling */
         form { background: #eef2f7; padding: 15px; border-radius: 5px; margin-top: 10px; }
         .form-header { font-weight: bold; margin-bottom: 10px; color: #34495e; display: block; }
-        
-        /* Grid for inputs */
         .input-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 120px; }
-        
-        /* Buttons */
         button { cursor: pointer; background-color: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; transition: background 0.2s; min-width: 100px; }
         button:hover { background-color: #27ae60; }
-        
-        /* Update Buttons */
         .btn-update { background-color: #3498db; }
         .btn-update:hover { background-color: #2980b9; }
-
-        /* Delete Button (Small) */
         .del-btn { background-color: #e74c3c; padding: 5px 10px; font-size: 12px; min-width: auto; }
         .del-btn:hover { background-color: #c0392b; }
-        
-        /* Inline Form for Delete */
         form.inline-form { display: inline; padding: 0; background: none; margin: 0; }
     </style>
 </head>
 <body>
     <h1>Caregivers Database Management System</h1>
     <div class="container">
-
-        <!-- 1. USER TABLE -->
         <div class="card">
-            <h3>1. USERS (Parent Table)</h3>
+            <h3>1. USERS</h3>
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -74,9 +54,8 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Create -->
             <form action="/user/create" method="post">
-                <div class="form-header">Add New User (Full Profile)</div>
+                <div class="form-header">Add New User</div>
                 <div class="input-row">
                     <input name="email" placeholder="Email" required>
                     <input name="given_name" placeholder="First Name" required>
@@ -88,9 +67,8 @@
                     <button>Create</button>
                 </div>
             </form>
-            <!-- Update -->
             <form action="/user/update_any" method="post" style="background: #e8f6f3;">
-                <div class="form-header">Update Any Field</div>
+                <div class="form-header">Update Field</div>
                 <div class="input-row">
                     <input type="number" name="uid" placeholder="ID" required style="flex: 0 0 60px;">
                     <select name="field_name" required>
@@ -109,9 +87,8 @@
             </form>
         </div>
 
-        <!-- 2. CAREGIVER TABLE -->
         <div class="card">
-            <h3>2. CAREGIVERS (Subtype)</h3>
+            <h3>2. CAREGIVERS</h3>
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -131,9 +108,8 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Create -->
             <form action="/caregiver/create" method="post">
-                <div class="form-header">Promote User to Caregiver (Complete)</div>
+                <div class="form-header">Add Caregiver Role</div>
                 <div class="input-row">
                     <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 80px;">
                     <input name="type" placeholder="Type (e.g. babysitter)" required>
@@ -143,9 +119,8 @@
                     <button>Add Role</button>
                 </div>
             </form>
-            <!-- Update -->
             <form action="/caregiver/update_any" method="post" style="background: #e8f6f3;">
-                <div class="form-header">Update Any Field</div>
+                <div class="form-header">Update Field</div>
                 <div class="input-row">
                     <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 60px;">
                     <select name="field_name" required>
@@ -161,9 +136,8 @@
             </form>
         </div>
 
-        <!-- 3. MEMBER TABLE -->
         <div class="card">
-            <h3>3. MEMBERS (Subtype)</h3>
+            <h3>3. MEMBERS</h3>
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -181,9 +155,8 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Create -->
             <form action="/member/create" method="post">
-                <div class="form-header">Promote User to Member (Complete)</div>
+                <div class="form-header">Add Member Role</div>
                 <div class="input-row">
                     <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 80px;">
                     <input name="rules" placeholder="House Rules" required>
@@ -191,9 +164,8 @@
                     <button>Add Role</button>
                 </div>
             </form>
-            <!-- Update -->
             <form action="/member/update_any" method="post" style="background: #e8f6f3;">
-                <div class="form-header">Update Any Field</div>
+                <div class="form-header">Update Field</div>
                 <div class="input-row">
                     <input type="number" name="uid" placeholder="User ID" required style="flex: 0 0 60px;">
                     <select name="field_name" required>
@@ -207,7 +179,6 @@
             </form>
         </div>
 
-        <!-- 4. ADDRESS TABLE -->
         <div class="card">
             <h3>4. ADDRESSES</h3>
             <div class="table-wrapper">
@@ -228,9 +199,8 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Create -->
             <form action="/address/create" method="post">
-                <div class="form-header">Add Address (Complete)</div>
+                <div class="form-header">Add Address</div>
                 <div class="input-row">
                     <input type="number" name="uid" placeholder="Mem ID" required style="flex: 0 0 80px;">
                     <input name="num" placeholder="House #" required style="flex: 0 0 80px;">
@@ -239,9 +209,8 @@
                     <button>Add</button>
                 </div>
             </form>
-            <!-- Update -->
             <form action="/address/update_any" method="post" style="background: #e8f6f3;">
-                <div class="form-header">Update Any Field</div>
+                <div class="form-header">Update Field</div>
                 <div class="input-row">
                     <input type="number" name="uid" placeholder="Mem ID" required style="flex: 0 0 60px;">
                     <select name="field_name" required>
@@ -256,7 +225,6 @@
             </form>
         </div>
 
-        <!-- 5. JOB TABLE -->
         <div class="card">
             <h3>5. JOBS</h3>
             <div class="table-wrapper">
@@ -278,9 +246,8 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Create -->
             <form action="/job/create" method="post">
-                <div class="form-header">Post New Job</div>
+                <div class="form-header">Post Job</div>
                 <div class="input-row">
                     <input type="number" name="mid" placeholder="Mem ID" required style="flex: 0 0 80px;">
                     <input name="type" placeholder="Care Type" required>
@@ -288,9 +255,8 @@
                     <button>Post</button>
                 </div>
             </form>
-            <!-- Update -->
             <form action="/job/update_any" method="post" style="background: #e8f6f3;">
-                <div class="form-header">Update Any Field</div>
+                <div class="form-header">Update Field</div>
                 <div class="input-row">
                     <input type="number" name="jid" placeholder="Job ID" required style="flex: 0 0 60px;">
                     <select name="field_name" required>
@@ -305,7 +271,6 @@
             </form>
         </div>
 
-        <!-- 6. APPLICATIONS -->
         <div class="card">
             <h3>6. APPLICATIONS</h3>
             <div class="table-wrapper">
@@ -325,18 +290,16 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Create -->
             <form action="/app/create" method="post">
-                <div class="form-header">Apply for Job</div>
+                <div class="form-header">Apply</div>
                 <div class="input-row">
                     <input type="number" name="jid" placeholder="Job ID" required>
                     <input type="number" name="cid" placeholder="CG ID" required>
                     <button>Apply</button>
                 </div>
             </form>
-            <!-- Update -->
             <form action="/app/update_any" method="post" style="background: #e8f6f3;">
-                <div class="form-header">Update Application Date</div>
+                <div class="form-header">Update Date</div>
                 <div class="input-row">
                     <input type="number" name="jid" placeholder="Job ID" required style="flex: 0 0 60px;">
                     <input type="number" name="cid" placeholder="CG ID" required style="flex: 0 0 60px;">
@@ -349,7 +312,6 @@
             </form>
         </div>
 
-        <!-- 7. APPOINTMENTS -->
         <div class="card">
             <h3>7. APPOINTMENTS</h3>
             <div class="table-wrapper">
@@ -373,9 +335,8 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Create -->
             <form action="/appt/create" method="post">
-                <div class="form-header">Book Appointment (Complete)</div>
+                <div class="form-header">Book Appointment</div>
                 <div class="input-row">
                     <input type="number" name="cid" placeholder="CG ID" required style="flex: 0 0 60px;">
                     <input type="number" name="mid" placeholder="Mem ID" required style="flex: 0 0 60px;">
@@ -385,9 +346,8 @@
                     <button>Book</button>
                 </div>
             </form>
-            <!-- Update -->
             <form action="/appt/update_any" method="post" style="background: #e8f6f3;">
-                <div class="form-header">Update Any Field</div>
+                <div class="form-header">Update Field</div>
                 <div class="input-row">
                     <input type="number" name="aid" placeholder="Appt ID" required style="flex: 0 0 60px;">
                     <select name="field_name" required>
@@ -397,12 +357,11 @@
                         <option value="appointment_time">Time</option>
                         <option value="work_hours">Hours</option>
                     </select>
-                    <input name="new_value" placeholder="Value (e.g. Accepted)" required>
+                    <input name="new_value" placeholder="Value" required>
                     <button class="btn-update">Update</button>
                 </div>
             </form>
         </div>
-
     </div>
 </body>
 </html>

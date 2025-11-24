@@ -1,6 +1,7 @@
+import sqlalchemy
 from sqlalchemy import create_engine, text
 
-# CONFIGURATION (No password)
+# CONFIGURATION
 db_string = "postgresql://Capta7nBlack@localhost:5432/caregivers_db"
 engine = create_engine(db_string)
 
@@ -8,7 +9,7 @@ def create_tables():
     with engine.connect() as conn:
         print("1. Creating tables...")
         
-        # Create USER table
+        # 1. USER
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS "USER" (
                 user_id SERIAL PRIMARY KEY,
@@ -22,7 +23,7 @@ def create_tables():
             );
         """))
 
-        # Create CAREGIVER table
+        # 2. CAREGIVER
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS CAREGIVER (
                 caregiver_user_id INTEGER PRIMARY KEY REFERENCES "USER"(user_id) ON DELETE CASCADE,
@@ -33,7 +34,7 @@ def create_tables():
             );
         """))
 
-        # Create MEMBER table
+        # 3. MEMBER
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS MEMBER (
                 member_user_id INTEGER PRIMARY KEY REFERENCES "USER"(user_id) ON DELETE CASCADE,
@@ -42,7 +43,7 @@ def create_tables():
             );
         """))
 
-        # Create ADDRESS table
+        # 4. ADDRESS
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS ADDRESS (
                 member_user_id INTEGER REFERENCES MEMBER(member_user_id) ON DELETE CASCADE,
@@ -52,7 +53,7 @@ def create_tables():
             );
         """))
 
-        # Create JOB table
+        # 5. JOB
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS JOB (
                 job_id SERIAL PRIMARY KEY,
@@ -63,7 +64,7 @@ def create_tables():
             );
         """))
 
-        # Create JOB_APPLICATION table
+        # 6. JOB_APPLICATION
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS JOB_APPLICATION (
                 caregiver_user_id INTEGER REFERENCES CAREGIVER(caregiver_user_id) ON DELETE CASCADE,
@@ -73,7 +74,7 @@ def create_tables():
             );
         """))
 
-        # Create APPOINTMENT table
+        # 7. APPOINTMENT
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS APPOINTMENT (
                 appointment_id SERIAL PRIMARY KEY,
@@ -84,52 +85,49 @@ def create_tables():
                 work_hours INTEGER,
                 status VARCHAR(20) DEFAULT 'Pending'
             );
-        """))        
-
-
+        """))
+        
         conn.commit()
         print("   Tables created successfully.")
 
 def seed_data():
     with engine.connect() as conn:
-        print("2. Seeding BULK data (10+ per table)...")
+        print("2. Seeding POP CULTURE data...")
         
-        # Clearing tables
+        # Clear tables
         conn.execute(text("TRUNCATE TABLE APPOINTMENT, JOB_APPLICATION, JOB, ADDRESS, MEMBER, CAREGIVER, \"USER\" RESTART IDENTITY CASCADE;"))
 
-        # 1. INSERT 22 USERS (Need enough to cover 10 Members + 10 Caregivers)
+        
         users_sql = """
         INSERT INTO "USER" (email, given_name, surname, city, phone_number, profile_description, password) VALUES
-        -- ORIGINAL DATA (For Queries)
-        ('arman@mail.com', 'Arman', 'Armanov', 'Astana', '+77011111111', 'Regular guy', 'pass123'), -- ID 1 (Member)
-        ('amina@mail.com', 'Amina', 'Aminova', 'Almaty', '+77022222222', 'Need help', 'pass123'), -- ID 2 (Member)
-        ('nanny1@mail.com', 'Sarah', 'Poppins', 'Astana', '+77033333333', 'Pro nanny', 'pass123'), -- ID 3 (CG)
-        ('elder1@mail.com', 'John', 'Doe', 'Astana', '+77044444444', 'Experienced nurse', 'pass123'), -- ID 4 (CG)
-        ('baby2@mail.com', 'Alice', 'Smith', 'Almaty', '+77055555555', 'Student job', 'pass123'), -- ID 5 (CG)
-        ('mem_kab@mail.com', 'Kairat', 'Nurtas', 'Astana', '+77066666666', 'Singer', 'pass123'), -- ID 6 (Member)
-        ('mem_ast@mail.com', 'Saule', 'Ivanova', 'Astana', '+77077777777', 'Busy mom', 'pass123'), -- ID 7 (Member)
-        ('cg_cheap@mail.com', 'Low', 'Price', 'Astana', '+77088888888', 'Newbie', 'pass123'), -- ID 8 (CG)
-        ('cg_exp@mail.com', 'High', 'Price', 'Astana', '+77099999999', 'Expert', 'pass123'), -- ID 9 (CG)
+        -- [ORIGINAL DATA NEEDED FOR LOGIC]
+        ('arman@mail.com', 'Arman', 'Armanov', 'Astana', '+77011111111', 'Regular guy', 'pass123'), -- ID 1
+        ('amina@mail.com', 'Amina', 'Aminova', 'Almaty', '+77022222222', 'Need help', 'pass123'), -- ID 2
+        ('nanny1@mail.com', 'Sarah', 'Poppins', 'Astana', '+77033333333', 'Pro nanny', 'pass123'), -- ID 3
+        ('elder1@mail.com', 'John', 'Doe', 'Astana', '+77044444444', 'Experienced nurse', 'pass123'), -- ID 4
+        ('baby2@mail.com', 'Alice', 'Smith', 'Almaty', '+77055555555', 'Student job', 'pass123'), -- ID 5
+        ('mem_kab@mail.com', 'Kairat', 'Nurtas', 'Astana', '+77066666666', 'Singer', 'pass123'), -- ID 6
+        ('mem_ast@mail.com', 'Saule', 'Ivanova', 'Astana', '+77077777777', 'Busy mom', 'pass123'), -- ID 7
+        ('cg_cheap@mail.com', 'Low', 'Price', 'Astana', '+77088888888', 'Newbie', 'pass123'), -- ID 8
+        ('cg_exp@mail.com', 'High', 'Price', 'Astana', '+77099999999', 'Expert', 'pass123'), -- ID 9
         ('user10@mail.com', 'Test', 'User', 'Shymkent', '+77100000000', 'Test', 'pass123'), -- ID 10
         
-        -- EXTRA FILLER DATA (To reach 10+ per table)
-        ('mem11@mail.com', 'M11', 'Surname11', 'Astana', '+77000000011', 'Desc', 'pass'), -- ID 11 (Member)
-        ('mem12@mail.com', 'M12', 'Surname12', 'Astana', '+77000000012', 'Desc', 'pass'), -- ID 12 (Member)
-        ('mem13@mail.com', 'M13', 'Surname13', 'Almaty', '+77000000013', 'Desc', 'pass'), -- ID 13 (Member)
-        ('mem14@mail.com', 'M14', 'Surname14', 'Almaty', '+77000000014', 'Desc', 'pass'), -- ID 14 (Member)
-        ('mem15@mail.com', 'M15', 'Surname15', 'Almaty', '+77000000015', 'Desc', 'pass'), -- ID 15 (Member)
-        ('mem16@mail.com', 'M16', 'Surname16', 'Almaty', '+77000000016', 'Desc', 'pass'), -- ID 16 (Member)
+        ('ironman@stark.com', 'Tony', 'Stark', 'Malibu', '+10000000001', 'Billionaire philanthropist', 'jarvis'), -- ID 11
+        ('bateman@pierce.com', 'Patrick', 'Bateman', 'New York', '+10000000002', 'Into mergers and acquisitions', 'paulallen'), -- ID 12
+        ('sherlock@baker.com', 'Sherlock', 'Holmes', 'London', '+44000000001', 'Consulting Detective', 'watson'), -- ID 13
+        ('django@unchained.com', 'Django', 'Freeman', 'Mississippi', '+15555555555', 'The fastest gun', 'freedom'), -- ID 14
+        ('onizuka@gto.com', 'Eikichi', 'Onizuka', 'Tokyo', '+81000000001', 'Great Teacher', 'bike'), -- ID 15
+        ('san@mononoke.com', 'San', 'Princess', 'Forest', '+81000000002', 'Raised by wolves', 'moro'), -- ID 16
         
-        ('cg17@mail.com', 'C17', 'Surname17', 'Astana', '+77000000017', 'Desc', 'pass'), -- ID 17 (CG)
-        ('cg18@mail.com', 'C18', 'Surname18', 'Astana', '+77000000018', 'Desc', 'pass'), -- ID 18 (CG)
-        ('cg19@mail.com', 'C19', 'Surname19', 'Almaty', '+77000000019', 'Desc', 'pass'), -- ID 19 (CG)
-        ('cg20@mail.com', 'C20', 'Surname20', 'Almaty', '+77000000020', 'Desc', 'pass'), -- ID 20 (CG)
-        ('cg21@mail.com', 'C21', 'Surname21', 'Almaty', '+77000000021', 'Desc', 'pass'), -- ID 21 (CG)
-        ('cg22@mail.com', 'C22', 'Surname22', 'Almaty', '+77000000022', 'Desc', 'pass'); -- ID 22 (CG)
+        ('gon@hunter.com', 'Gon', 'Freecss', 'Whale Island', '+81000000003', 'Very energetic and strong', 'rock'), -- ID 17
+        ('killua@zoldyck.com', 'Killua', 'Zoldyck', 'Kukuroo', '+81000000004', 'Professional assassin skills', 'lightning'), -- ID 18
+        ('toji@fushiguro.com', 'Toji', 'Fushiguro', 'Tokyo', '+81000000005', 'Sorcerer Killer, works for money', 'zenin'), -- ID 19
+        ('watson@baker.com', 'John', 'Watson', 'London', '+44000000002', 'Former army doctor', 'mary'), -- ID 20
+        ('eboshi@iron.com', 'Lady', 'Eboshi', 'Iron Town', '+81000000006', 'Leader of Iron Town', 'leper'), -- ID 21
+        ('ashitaka@emishi.com', 'Ashitaka', 'Prince', 'Emishi', '+81000000007', 'Cursed prince', 'yakul'); -- ID 22
         """
         conn.execute(text(users_sql))
 
-        # 2. INSERT 11 CAREGIVERS
         cg_sql = """
         INSERT INTO CAREGIVER (caregiver_user_id, photo, gender, caregiving_type, hourly_rate) VALUES
         (3, 'p1.jpg', 'F', 'babysitter', 15.00),
@@ -137,104 +135,103 @@ def seed_data():
         (5, 'p3.jpg', 'F', 'babysitter', 12.00),
         (8, 'p4.jpg', 'M', 'playmate for children', 8.00),
         (9, 'p5.jpg', 'F', 'caregiver for elderly', 25.00),
-        -- Extra
-        (17, 'p6.jpg', 'M', 'babysitter', 10.00),
-        (18, 'p7.jpg', 'F', 'babysitter', 11.00),
-        (19, 'p8.jpg', 'M', 'playmate for children', 9.00),
-        (20, 'p9.jpg', 'F', 'caregiver for elderly', 18.00),
-        (21, 'p10.jpg', 'M', 'babysitter', 14.00),
-        (22, 'p11.jpg', 'F', 'playmate for children', 13.00);
+        
+        (17, 'gon.jpg', 'M', 'playmate for children', 10.00), -- Gon (Cheap and fun)
+        (18, 'killua.jpg', 'M', 'playmate for children', 50.00), -- Killua (Premium bodyguard/playmate)
+        (19, 'toji.jpg', 'M', 'babysitter', 100.00), -- Toji (Expensive, needs cash)
+        (20, 'watson.jpg', 'M', 'caregiver for elderly', 30.00), -- Watson (Doctor, good for elderly)
+        (21, 'eboshi.jpg', 'F', 'caregiver for elderly', 40.00), -- Eboshi (Takes care of the sick)
+        (22, 'ashitaka.jpg', 'M', 'playmate for children', 15.00); -- Ashitaka (Responsible)
         """
         conn.execute(text(cg_sql))
 
-        # 3. INSERT 10 MEMBERS
         mem_sql = """
         INSERT INTO MEMBER (member_user_id, house_rules, dependent_description) VALUES
         (1, 'No smoking', 'Active toddler'),
-        (2, 'Quiet after 9pm', 'Grandmother'),
+        (2, 'Quiet after 9pm', 'Grandmother needs help'),
         (6, 'No pets', '3 kids'),
         (7, 'Cleanliness', 'Newborn baby'),
-        -- Extra
-        (11, 'None', 'Son'),
-        (12, 'None', 'Daughter'),
-        (13, 'No guests', 'Twins'),
-        (14, 'No shoes', 'Baby'),
-        (15, 'Quiet', 'Elderly'),
-        (16, 'None', 'Cat and Kid');
+        
+        (11, 'Do not touch my suits', 'Morgan Stark (Daughter)'), -- Tony Stark
+        (12, 'Must like Phil Collins', 'No dependents, just cleaning'), -- Patrick Bateman
+        (13, 'No loud noises', 'Mrs. Hudson (Landlady)'), -- Sherlock
+        (14, 'Freedom above all', 'Broomhilda (Wife)'), -- Django
+        (15, 'Respect the bike', 'Problematic students'), -- Onizuka
+        (16, 'Protect the forest', 'Wolf pups'); -- San
         """
         conn.execute(text(mem_sql))
 
-        # 4. INSERT 10 ADDRESSES
+        # 4. INSERT ADDRESSES
         addr_sql = """
         INSERT INTO ADDRESS (member_user_id, house_number, street, town) VALUES
         (1, '10', 'Mangilik El', 'Astana'),
         (2, '5', 'Abay', 'Almaty'),
         (6, '42', 'Kabanbay Batyr', 'Astana'),
         (7, '12', 'Turan', 'Astana'),
-        -- Extra
-        (11, '1', 'Street A', 'Astana'),
-        (12, '2', 'Street B', 'Astana'),
-        (13, '3', 'Street C', 'Almaty'),
-        (14, '4', 'Street D', 'Almaty'),
-        (15, '5', 'Street E', 'Almaty'),
-        (16, '6', 'Street F', 'Almaty');
+        
+        (11, '10880', 'Malibu Point', 'California'), -- Stark
+        (12, '55', 'West 81st Street', 'New York'), -- Bateman
+        (13, '221B', 'Baker Street', 'London'), -- Sherlock
+        (14, '1', 'Candyland', 'Mississippi'), -- Django
+        (15, '3-4', 'Kichijoji', 'Tokyo'), -- Onizuka
+        (16, '99', 'Iron Town Road', 'Forest'); -- San
         """
         conn.execute(text(addr_sql))
 
-        # 5. INSERT 10 JOBS
-
+        # 5. INSERT JOBS
         job_sql = """
         INSERT INTO JOB (member_user_id, required_caregiving_type, other_requirements, date_posted) VALUES
         (2, 'caregiver for elderly', 'Must be soft-spoken', '2025-11-01'),
         (2, 'caregiver for elderly', 'Night shift', '2025-11-02'),
         (1, 'babysitter', 'Urgent', '2025-11-05'),
         (6, 'caregiver for elderly', 'English speaking', '2025-11-10'),
-        -- Extra
-        (11, 'babysitter', 'Fun', '2025-11-11'),
-        (12, 'babysitter', 'Math tutor', '2025-11-12'),
-        (13, 'playmate for children', 'Active', '2025-11-13'),
-        (14, 'babysitter', 'Weekend', '2025-11-14'),
-        (15, 'caregiver for elderly', 'Strong', '2025-11-15'),
-        (16, 'playmate for children', 'Gaming', '2025-11-16');
+        
+        (11, 'babysitter', 'Must understand quantum physics', '2025-11-11'), -- Stark needs smart babysitter
+        (12, 'caregiver for elderly', 'Must handle cleaning well', '2025-11-12'), -- Bateman
+        (13, 'caregiver for elderly', 'Must tolerate violin practice', '2025-11-13'), -- Sherlock
+        (14, 'playmate for children', 'Teach them to ride horses', '2025-11-14'), -- Django
+        (15, 'playmate for children', 'Must be tough', '2025-11-15'), -- Onizuka
+        (16, 'caregiver for elderly', 'Must respect nature', '2025-11-16'); -- San
         """
         conn.execute(text(job_sql))
 
-        # 6. INSERT 10 APPLICATIONS
+        # 6. INSERT APPLICATIONS
         app_sql = """
         INSERT INTO JOB_APPLICATION (caregiver_user_id, job_id, date_applied) VALUES
         (4, 1, '2025-11-03'),
         (9, 1, '2025-11-03'),
         (3, 3, '2025-11-06'),
-        -- Extra
-        (17, 5, '2025-11-12'),
-        (18, 6, '2025-11-13'),
-        (19, 7, '2025-11-14'),
-        (20, 8, '2025-11-15'),
-        (21, 9, '2025-11-16'),
-        (22, 10, '2025-11-17'),
+        
+        (17, 5, '2025-11-12'), -- Gon applies to Stark's job
+        (18, 5, '2025-11-13'), -- Killua applies to Stark's job
+        (19, 9, '2025-11-14'), -- Toji applies to Onizuka's job
+        (20, 7, '2025-11-15'), -- Watson applies to Sherlock's job
+        (21, 6, '2025-11-16'), -- Eboshi applies to Bateman's job
+        (22, 8, '2025-11-17'), -- Ashitaka applies to Django's job
         (5, 2, '2025-11-04');
         """
         conn.execute(text(app_sql))
 
-        # 7. INSERT 10 APPOINTMENTS
+        # 7. INSERT APPOINTMENTS
         apt_sql = """
         INSERT INTO APPOINTMENT (caregiver_user_id, member_user_id, appointment_date, appointment_time, work_hours, status) VALUES
         (3, 1, '2025-11-20', '14:00', 4, 'Accepted'),
         (4, 2, '2025-11-21', '10:00', 5, 'Accepted'),
         (8, 7, '2025-11-22', '09:00', 2, 'Pending'),
         (5, 6, '2025-11-23', '18:00', 3, 'Accepted'),
-        -- Extra
-        (17, 11, '2025-11-24', '10:00', 2, 'Accepted'),
-        (18, 12, '2025-11-25', '11:00', 3, 'Pending'),
-        (19, 13, '2025-11-26', '12:00', 4, 'Accepted'),
-        (20, 14, '2025-11-27', '13:00', 5, 'Declined'),
-        (21, 15, '2025-11-28', '14:00', 6, 'Accepted'),
-        (22, 16, '2025-11-29', '15:00', 2, 'Pending');
+        
+        (17, 11, '2025-11-24', '10:00', 2, 'Accepted'), -- Gon works for Tony Stark
+        (18, 12, '2025-11-25', '11:00', 3, 'Pending'),  -- Killua pending for Bateman
+        (20, 13, '2025-11-26', '12:00', 4, 'Accepted'), -- Watson works for Sherlock
+        (19, 14, '2025-11-27', '13:00', 5, 'Declined'), -- Toji declined by Django
+        (22, 16, '2025-11-28', '14:00', 6, 'Accepted'), -- Ashitaka works for San
+        (21, 15, '2025-11-29', '15:00', 2, 'Pending');  -- Eboshi pending for Onizuka
         """
         conn.execute(text(apt_sql))
 
         conn.commit()
-        print("   Data seeded successfully (10+ per table).")
+        print("   Data seeded successfully (Pop Culture Edition).")
+
 if __name__ == "__main__":
     create_tables()
     seed_data()
