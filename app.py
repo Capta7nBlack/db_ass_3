@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import create_engine, text
 
+# 1. Database Connection (Cloud or Local)
 url = os.getenv("DATABASE_URL")
 if not url:
     url = "postgresql://Capta7nBlack@localhost:5432/caregivers_db"
@@ -16,6 +17,7 @@ engine = create_engine(url)
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+# 2. Main Page
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     with engine.connect() as conn:
@@ -33,6 +35,7 @@ async def read_root(request: Request):
         "addresses": addresses, "jobs": jobs, "apps": apps, "appts": appts
     })
 
+# 3. CRUD Operations
 @app.post("/user/create")
 async def create_user(
     email: str = Form(...), given_name: str = Form(...), surname: str = Form(...), 
@@ -226,6 +229,8 @@ async def delete_appt(aid: int):
         conn.commit()
     return RedirectResponse("/", status_code=303)
 
+# 4. Server Start Logic
 if __name__ == "__main__":
-    print("Server running on http://127.0.0.1:8000")
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+    port = int(os.getenv("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
